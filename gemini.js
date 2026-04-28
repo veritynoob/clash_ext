@@ -16,6 +16,11 @@ function main(config) {
     p.name.includes('新加坡')
   );
 
+  // 筛选名称包含"美国"或"新加坡"的节点
+  const openRouterProxies = (config.proxies || []).filter(p =>
+    p.name.includes('美国') || p.name.includes('新加坡')
+  );
+
   // 添加 Gemini 规则提供者
   const geminiRuleProvider = {
     type: 'http',
@@ -34,14 +39,26 @@ function main(config) {
 
   // 添加新加坡策略组
   const singaporeGroup = {
-    type: 'select',
+    type: 'url-test',
     name: 'Singapore',
-    proxies: singaporeProxies.map(p => p.name)
+    proxies: singaporeProxies.map(p => p.name),
+    interval: 600,
+    tolerance: 50
+  };
+
+  // 添加 OpenRouter 策略组
+  const openRouterGroup = {
+    type: 'url-test',
+    name: 'OpenRouter',
+    proxies: openRouterProxies.map(p => p.name),
+    interval: 600,
+    tolerance: 50
   };
 
   // 添加分流规则
   const rejectRule = 'RULE-SET,reject,REJECT';
   const geminiRule = 'RULE-SET,gemini,Singapore';
+  const openRouterRule = 'DOMAIN-KEYWORD,openrouter.ai,OpenRouter';
 
   // 写入配置
   config['rule-providers'] = config['rule-providers'] || {};
@@ -50,10 +67,12 @@ function main(config) {
 
   config['proxy-groups'] = config['proxy-groups'] || [];
   config['proxy-groups'].push(singaporeGroup);
+  config['proxy-groups'].push(openRouterGroup);
 
   config['rules'] = config['rules'] || [];
-  // REJECT 优先级最高
   config['rules'].unshift(geminiRule);
+  config['rules'].unshift(openRouterRule);
+  config['rules'].unshift(rejectRule); // REJECT 优先级最高
 
   return config;
 }
