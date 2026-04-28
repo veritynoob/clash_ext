@@ -11,11 +11,6 @@
  * @returns {Object} - 修改后的配置
  */
 function main(config) {
-  // 筛选名称包含"新加坡"的节点
-  const singaporeProxies = (config.proxies || []).filter(p =>
-    p.name.includes('新加坡')
-  );
-
   // 筛选名称包含"美国"或"新加坡"的节点
   const openRouterProxies = (config.proxies || []).filter(p =>
     p.name.includes('美国') || p.name.includes('新加坡')
@@ -37,15 +32,6 @@ function main(config) {
     interval: 86400,
   };
 
-  // 添加新加坡策略组
-  const singaporeGroup = {
-    type: 'url-test',
-    name: 'Singapore',
-    proxies: singaporeProxies.map(p => p.name),
-    interval: 600,
-    tolerance: 50
-  };
-
   // 添加 OpenRouter 策略组
   const openRouterGroup = {
     type: 'url-test',
@@ -57,7 +43,7 @@ function main(config) {
 
   // 添加分流规则
   const rejectRule = 'RULE-SET,reject,REJECT';
-  const geminiRule = 'RULE-SET,gemini,Singapore';
+  const geminiRule = 'RULE-SET,gemini,OpenRouter';
   const openRouterRule = 'DOMAIN-KEYWORD,openrouter.ai,OpenRouter';
 
   // 写入配置
@@ -66,7 +52,6 @@ function main(config) {
   config['rule-providers'].gemini = geminiRuleProvider;
 
   config['proxy-groups'] = config['proxy-groups'] || [];
-  config['proxy-groups'].push(singaporeGroup);
   config['proxy-groups'].push(openRouterGroup);
 
   config['rules'] = config['rules'] || [];
