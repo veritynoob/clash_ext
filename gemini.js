@@ -22,7 +22,14 @@ function main(config) {
     behavior: 'classical',
     url: 'https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Gemini/Gemini.yaml',
     interval: 86400,
-    tolerance: 50
+  };
+
+  // 添加广告/跟踪域名屏蔽规则提供者
+  const rejectProvider = {
+    type: 'http',
+    behavior: 'domain',
+    url: 'https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt',
+    interval: 86400,
   };
 
   // 添加新加坡策略组
@@ -32,17 +39,20 @@ function main(config) {
     proxies: singaporeProxies.map(p => p.name)
   };
 
-  // 添加 Gemini 分流规则
+  // 添加分流规则
+  const rejectRule = 'RULE-SET,reject,REJECT';
   const geminiRule = 'RULE-SET,gemini,Singapore';
 
   // 写入配置
   config['rule-providers'] = config['rule-providers'] || {};
+  config['rule-providers'].reject = rejectProvider;
   config['rule-providers'].gemini = geminiRuleProvider;
 
   config['proxy-groups'] = config['proxy-groups'] || [];
   config['proxy-groups'].push(singaporeGroup);
 
   config['rules'] = config['rules'] || [];
+  // REJECT 优先级最高
   config['rules'].unshift(geminiRule);
 
   return config;
