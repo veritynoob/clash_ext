@@ -1,5 +1,5 @@
 /**
- * Gemini 分流覆写脚本
+ * ICU 分流覆写脚本
  *
  * 用法：在 Mihomo Party / Clash Verge Rev 的覆写/扩展脚本中加载此文件
  */
