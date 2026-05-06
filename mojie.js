@@ -59,5 +59,12 @@ function main(config) {
   config['rules'].unshift(openRouterRule);
   config['rules'].unshift(rejectRule); // REJECT 优先级最高
 
+  // 过滤所有代理组中包含"日本"的节点
+  (config['proxy-groups'] || []).forEach(group => {
+    if (group.proxies && Array.isArray(group.proxies)) {
+      group.proxies = group.proxies.filter(p => !p.includes('日本'));
+    }
+  });
+
   return config;
 }
